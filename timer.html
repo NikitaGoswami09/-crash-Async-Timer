@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timer</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+    #display {
+        font-size: 3em;
+        margin-bottom: 20px;
+    }
+    input[type="number"] {
+        width: 60px;
+        margin: 0 5px;
+        text-align: center;
+    }
+    button {
+        margin: 0 10px;
+        padding: 10px 20px;
+        font-size: 1em;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<div>
+    <input type="number" id="hours" placeholder="HH" min="0" max="23"> :
+    <input type="number" id="minutes" placeholder="MM" min="0" max="59"> :
+    <input type="number" id="seconds" placeholder="SS" min="0" max="59">
+</div>
+
+<div id="buttons">
+    <button id="startBtn" onclick="start()">Start</button>
+    <button id="pauseBtn" onclick="pause()">Pause</button>
+    <button id="resetBtn" onclick="reset()">Reset</button>
+</div>
+
+<div id="display">00:00:00</div>
+
+<script>
+    let timer;
+    let totalTime = 0;
+    let remainingTime = 0;
+    let startTime = 0;
+    let running = false;
+
+    function start() {
+        if (!running) {
+            let hours = parseInt(document.getElementById('hours').value) || 0;
+            let minutes = parseInt(document.getElementById('minutes').value) || 0;
+            let seconds = parseInt(document.getElementById('seconds').value) || 0;
+
+            totalTime = hours * 3600 + minutes * 60 + seconds;
+            remainingTime = totalTime;
+            startTime = Date.now();
+            timer = setInterval(updateTimer, 1000);
+            running = true;
+        }
+    }
+
+    function pause() {
+        if (running) {
+            clearInterval(timer);
+            remainingTime -= Math.floor((Date.now() - startTime) / 1000);
+            running = false;
+        }
+    }
+
+    function reset() {
+        clearInterval(timer);
+        running = false;
+        document.getElementById('hours').value = '';
+        document.getElementById('minutes').value = '';
+        document.getElementById('seconds').value = '';
+        remainingTime = 0;
+        totalTime = 0;
+        updateDisplay();
+    }
+
+    function updateTimer() {
+        let elapsed = Math.floor((Date.now() - startTime) / 1000);
+        remainingTime = totalTime - elapsed;
+        if (remainingTime <= 0) {
+            clearInterval(timer);
+            remainingTime = 0;
+            running = false;
+        }
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        let hours = Math.floor(remainingTime / 3600);
+        let minutes = Math.floor((remainingTime % 3600) / 60);
+        let seconds = remainingTime % 60;
+
+        let displayString = hours.toString().padStart(2, '0') + ':' +
+                            minutes.toString().padStart(2, '0') + ':' +
+                            seconds.toString().padStart(2, '0');
+
+        document.getElementById('display').textContent = displayString;
+    }
+</script>
+
+</body>
+</html>
